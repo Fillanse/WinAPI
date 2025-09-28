@@ -35,7 +35,7 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			INT i = SendMessage(hCombo, CB_GETCURSEL, 0, 0);
 			SendMessage(hCombo, CB_GETLBTEXT, i, (LPARAM)sz_buffer);
 			CHAR sz_message[SIZE];
-			sprintf(sz_message, "You chose case %i with value '%s'.", i, sz_buffer);
+			sprintf(sz_message, "You have selected %i with value '%s'.", i, sz_buffer);
 			MessageBox(hwnd, sz_message, "Info", MB_OK | MB_ICONINFORMATION);
 		}
 			break;

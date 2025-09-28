@@ -3,6 +3,8 @@
 #include<commctrl.h>
 #include"resource.h"
 
+#pragma comment(lib, "comctl32.lib")
+
 INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -18,10 +20,13 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:		
 	{
+		InitCommonControls();
 		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
 		HWND hEditPassword = GetDlgItem(hwnd, IDC_EDIT_PASSWORD);
-		Edit_SetCueBannerText(hEditLogin, (LPARAM)"Login");
-		Edit_SetCueBannerText(hEditPassword, (LPARAM)"Password");
+		//Edit_SetCueBannerText(hEditLogin, (LPARAM)"Login");
+		//Edit_SetCueBannerText(hEditPassword, (LPARAM)"Password");
+		SendMessage(hEditLogin, EM_SETCUEBANNER, 0, (LPARAM)"Login");
+		
 		//SetFocus(hEditLogin);
 		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
