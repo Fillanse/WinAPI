@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "resource.h"
 
-CONST WCHAR szWNDCLASSNAME[] =  L"My Window Class";
+CONST WCHAR szWNDCLASSNAME[] = L"My Window Class";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -28,7 +28,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	wClass.lpszMenuName = NULL;
 	wClass.lpfnWndProc = WndProc;
 
-	if(!RegisterClassEx(&wClass)) {
+	if (!RegisterClassEx(&wClass)) {
 		MessageBox(NULL, L"Window Registration Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
 		return 0;
 	}
@@ -48,7 +48,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
-	
+
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0) > 0) {
 		TranslateMessage(&msg);
@@ -61,10 +61,58 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg)
 	{
-	case WM_CREATE: break;
-	case WM_COMMAND: break;
+	case WM_CREATE:
+	{
+		HWND hStatic = CreateWindowEx(
+			NULL,
+			L"STATIC",
+			L"This static-text as created via CreateWindowEx function",
+			WS_CHILD | WS_VISIBLE,
+			10, 10, 300, 20,
+			hwnd,
+			(HMENU)1,
+			(HINSTANCE)GetModuleHandle(NULL),
+			NULL);
+		HWND hEdit = CreateWindowEx(
+			NULL,
+			L"EDIT",
+			L"",
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_CENTER,
+			10, 40, 300, 20,
+			hwnd,
+			(HMENU)2,
+			(HINSTANCE)GetModuleHandle(NULL),
+			NULL);
+		HWND hButton = CreateWindowEx(
+			NULL,
+			L"BUTTON",
+			L"Apply",
+			WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+			320, 40, 100, 20,
+			hwnd,
+			(HMENU)3,
+			(HINSTANCE)GetModuleHandle(NULL),
+			NULL);
+	}
+	break;
+	case WM_COMMAND: {
+		HWND hEdit = GetDlgItem(hwnd, 2);
+		CONST INT SIZE = 256;
+		WCHAR buffer[SIZE];
+		switch (LOWORD(wParam))
+	case 3: {
+			GetWindowText(hEdit, buffer, SIZE);
+			MessageBox(hwnd, buffer, L"Information", MB_OK | MB_ICONINFORMATION);
+		}
+		break;
+
+		break;
+	}
 	case WM_DESTROY: PostQuitMessage(0); break;
-	case WM_CLOSE: DestroyWindow(hwnd); break;
+	case WM_CLOSE:
+		if (MessageBox(hwnd, L"Are you sure you want to exit?", L"Exit", MB_ICONQUESTION | MB_YESNO) == IDYES)
+			DestroyWindow(hwnd);
+		break;
 	default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return FALSE;
