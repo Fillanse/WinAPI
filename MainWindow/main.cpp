@@ -1,9 +1,27 @@
 #include <Windows.h>
+#include <winuser.h>
+#include <iostream>
 #include "resource.h"
 
 CONST WCHAR szWNDCLASSNAME[] = L"My Window Class";
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+void UpdateWindowTitleWithPosSize(HWND hwnd)
+{
+	RECT window;
+	WCHAR title[256];
+
+	if (!GetWindowRect(hwnd, &window)) return;
+
+	swprintf_s(
+		title, L"MainWindow - Pos: %d,%d Size: %d x %d",
+		window.left, window.top,
+		window.right - window.left,
+		window.bottom - window.top);
+
+	SetWindowText(hwnd, title);
+}
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -33,12 +51,19 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
+	int screenW = GetSystemMetrics(SM_CXSCREEN);
+	int screenH = GetSystemMetrics(SM_CYSCREEN);
+	int winW = int(screenW * 0.75);
+	int winH = int(screenH * 0.75);
+	int winX = (screenW - winW) / 2;
+	int winY = (screenH - winH) / 2;
+
 	HWND hwnd = CreateWindowEx(
 		NULL,
 		(LPCWSTR)szWNDCLASSNAME,
 		(LPCWSTR)szWNDCLASSNAME,
 		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 800, 600,
+		winX, winY, winW, winH,
 		NULL, NULL, hInstance, NULL);
 
 	if (hwnd == NULL) {
@@ -46,6 +71,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
+	UpdateWindowTitleWithPosSize(hwnd);
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
 
@@ -108,6 +134,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		break;
 	}
+	case WM_MOVE: UpdateWindowTitleWithPosSize(hwnd); break;
+	case WM_SIZE: UpdateWindowTitleWithPosSize(hwnd); break;
 	case WM_DESTROY: PostQuitMessage(0); break;
 	case WM_CLOSE:
 		if (MessageBox(hwnd, L"Are you sure you want to exit?", L"Exit", MB_ICONQUESTION | MB_YESNO) == IDYES)
